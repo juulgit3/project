@@ -2,103 +2,456 @@
 <html lang="da">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>Boligboblen</title>
   <link rel="stylesheet" href="styles.css" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <div id="app">
+<div id="app">
 
-    <!-- HEADER -->
-    <header id="header">
-      <div class="header-title">
-        <span class="logo-dk">🏚</span>
-        <h1>Boligboblen</h1>
-        <span class="tagline">Ejendomsspekulant simulator — København, 2024</span>
-      </div>
-      <div class="header-stats">
-        <div class="stat">
-          <span class="stat-label">DAG</span>
-          <span class="stat-value" id="stat-day">1 / 30</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">KASSE</span>
-          <span class="stat-value cash" id="stat-cash">500.000 kr</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">GÆLD</span>
-          <span class="stat-value debt" id="stat-debt">0 kr</span>
-        </div>
-        <div class="stat">
-          <span class="stat-label">BYDEL</span>
-          <span class="stat-value" id="stat-location">Nørrebro</span>
-        </div>
-      </div>
-    </header>
-
-    <!-- EVENT BANNER -->
-    <div id="event-banner" class="event-banner hidden">
-      <span id="event-icon">📰</span>
-      <span id="event-text">Ingen begivenheder</span>
+  <!-- TITLE BAR -->
+  <div id="titlebar">
+    <div class="titlebar-left">
+      <div class="titlebar-icon">🏚</div>
+      <span>MARKET_OPERATOR_V1.0</span>
     </div>
+    <div class="titlebar-day" id="titlebar-day">DAY 01/30</div>
+  </div>
 
-    <!-- MAIN LAYOUT -->
-    <main id="main">
+  <!-- SCREEN: STATS -->
+  <div id="screen">
+    <div class="screen-row">
+      <div class="screen-left">
+        <span class="screen-label">LIKVIDITET (DKK)</span>
+        <div class="meter-wrap" id="meter-cash"></div>
+      </div>
+      <div class="screen-value green" id="stat-cash">500.000</div>
+    </div>
+    <div class="screen-row">
+      <div class="screen-left">
+        <span class="screen-label">GÆLD (DKK)</span>
+        <div class="meter-wrap" id="meter-debt"></div>
+      </div>
+      <div class="screen-value red" id="stat-debt">0</div>
+    </div>
+    <div class="screen-row">
+      <div class="screen-left">
+        <span class="screen-label">MENTAL SUNDHED</span>
+        <div class="meter-wrap" id="meter-mental"></div>
+      </div>
+      <div class="screen-value yellow" id="stat-mental">STABIL</div>
+    </div>
+  </div>
 
-      <!-- LEFT: MAP / TRAVEL -->
-      <section class="panel" id="panel-travel">
-        <h2>📍 Bydele</h2>
-        <div id="location-grid"></div>
-      </section>
-
-      <!-- CENTER: MARKET -->
-      <section class="panel" id="panel-market">
-        <h2>🏷 Marked — <span id="market-location-name">Nørrebro</span></h2>
-        <div id="market-listings"></div>
-      </section>
-
-      <!-- RIGHT: PORTFOLIO + ACTIONS -->
-      <section class="panel" id="panel-portfolio">
-        <h2>🗂 Din portefølje</h2>
-        <div id="portfolio-list">
-          <p class="empty-msg">Du ejer ingen ejendomme endnu.<br><small>"Første skridt er altid det sværeste — og dyrest."</small></p>
-        </div>
-
-        <div class="action-group">
-          <h3>💳 Lån</h3>
-          <button class="btn btn-secondary" onclick="takeLoan('bank')">Banklån (max 2M, 5%/dag)</button>
-          <button class="btn btn-secondary" onclick="takeLoan('parent')">Forældrelån (max 1M, 1%/dag)</button>
-        </div>
-
-        <div class="action-group next-day-wrap">
-          <button class="btn btn-primary" id="btn-next-day" onclick="nextDay()">Næste dag →</button>
-        </div>
-      </section>
-
-    </main>
-
-    <!-- END SCREEN -->
-    <div id="end-screen" class="hidden">
-      <div class="end-card">
-        <div class="end-emoji" id="end-emoji">🏆</div>
-        <h2 id="end-title">Spillet er slut</h2>
-        <p id="end-score"></p>
-        <p id="end-message"></p>
-        <button class="btn btn-primary" onclick="restartGame()">Spil igen</button>
+  <!-- INFO ROW -->
+  <div id="info-row">
+    <div class="info-box">
+      <div class="info-box-label">LOKATION</div>
+      <div class="info-box-value">
+        <span class="location-dot"></span>
+        <span id="stat-location">Nørrebro</span>
       </div>
     </div>
+    <div class="info-box">
+      <div class="info-box-label">SENESTE NYT</div>
+      <div class="info-box-value" id="stat-event" style="font-size:11px;color:#008822;">—</div>
+    </div>
+  </div>
 
-    <!-- MODAL -->
-    <div id="modal-overlay" class="hidden" onclick="closeModal()">
-      <div id="modal" onclick="event.stopPropagation()">
-        <button class="modal-close" onclick="closeModal()">✕</button>
-        <div id="modal-content"></div>
+  <!-- EVENT TICKER -->
+  <div id="event-ticker" class="hidden">
+    <span class="ticker-tag" id="ticker-tag">EVT</span>
+    <span id="ticker-text"></span>
+  </div>
+
+  <!-- QUOTE BOX -->
+  <div id="quote-box">"Velkommen til markedet. God fornuft er ikke inkluderet i prisen."</div>
+
+  <!-- MAIN CONTENT (tabs) -->
+  <div id="main-content">
+
+    <!-- MARKET -->
+    <div class="panel active" id="panel-market">
+      <div class="panel-title">
+        <span>EJENDOMSMARKEDET — <span id="market-loc-name">NØRREBRO</span></span>
+        <span id="market-count"></span>
       </div>
+      <table class="market-table">
+        <thead>
+          <tr><th>Type</th><th style="text-align:right">Pris</th></tr>
+        </thead>
+        <tbody id="market-tbody"></tbody>
+      </table>
+      <div class="market-actions">
+        <button class="btn btn-primary" id="btn-buy" onclick="handleBuy()">🛒 KØB</button>
+        <button class="btn" id="btn-sell-quick" onclick="handleQuickSell()">🏷 SÆLG</button>
+      </div>
+    </div>
+
+    <!-- PORTFOLIO -->
+    <div class="panel" id="panel-portfolio">
+      <div class="panel-title"><span>PORTEFØLJE</span><span id="portfolio-count"></span></div>
+      <div id="portfolio-list"></div>
+    </div>
+
+    <!-- FINANCE -->
+    <div class="panel" id="panel-finance">
+      <div class="panel-title"><span>FINANSIERING</span></div>
+      <div class="loan-detail">Advarsel: Gæld akkumulerer renter dagligt. Læs det med småt.<br>Det er der ingen der gør.</div>
+      <button class="btn btn-full" style="margin-bottom:5px" onclick="takeLoan('bank')">🏦 BANKLÅN (MAX 2M)</button>
+      <div class="loan-detail">Rente: 3% pr. dag. Ingen afdragsfrihed. Ingen sympati.</div>
+      <button class="btn btn-full" style="margin-bottom:5px" onclick="takeLoan('parent')">👩 FORÆLDRELÅN (MAX 1M)</button>
+      <div class="loan-detail">Rente: 1% pr. dag. Plus uendelig skyldfølelse ved familiemiddage.</div>
+    </div>
+
+    <!-- TRAVEL -->
+    <div class="panel" id="panel-travel">
+      <div class="panel-title"><span>REJSE TIL BYDEL</span></div>
+      <div id="travel-list"></div>
     </div>
 
   </div>
 
-  <script src="app.js"></script>
+  <!-- TAB BAR -->
+  <div id="tabbar">
+    <button class="tab-btn active" onclick="switchTab('market', this)">
+      <span class="tab-icon">🏠</span>
+      MARKED
+    </button>
+    <button class="tab-btn" onclick="switchTab('portfolio', this)">
+      <span class="tab-icon">📋</span>
+      PORTFOLIO
+    </button>
+    <button class="tab-btn" onclick="switchTab('finance', this)">
+      <span class="tab-icon">🏛</span>
+      FINANCE
+    </button>
+    <button class="tab-btn" onclick="switchTab('travel', this)">
+      <span class="tab-icon">✈️</span>
+      TRAVEL
+    </button>
+    <button class="tab-btn next-day-tab" id="btn-next-day" onclick="nextDay()">
+      <span class="tab-icon">⏭</span>
+      NEXT DAY
+    </button>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay" class="hidden" onclick="closeModal()">
+  <div id="modal" onclick="event.stopPropagation()">
+    <div class="modal-titlebar">
+      <span id="modal-title-text">DIALOG</span>
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- END SCREEN -->
+<div id="end-screen" class="hidden">
+  <div class="end-card">
+    <div class="end-titlebar">GAME OVER — BOLIGBOBLEN v1.0</div>
+    <div class="end-body">
+      <div class="end-emoji" id="end-emoji">🏆</div>
+      <h2 id="end-title">Spillet er slut</h2>
+      <div id="end-score"></div>
+      <p id="end-message"></p>
+      <button class="btn btn-primary" onclick="restartGame()">▶ SPIL IGEN</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+// === TAB SWITCHING ===
+function switchTab(name, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn:not(.next-day-tab)').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+// === SELECTED MARKET ROW ===
+let selectedListingIdx = null;
+
+function selectListing(idx) {
+  selectedListingIdx = idx;
+  document.querySelectorAll('.market-table tr.selected').forEach(r => r.classList.remove('selected'));
+  const rows = document.querySelectorAll('#market-tbody tr');
+  if (rows[idx]) rows[idx].classList.add('selected');
+}
+
+function handleBuy() {
+  if (selectedListingIdx === null) {
+    showQuote("Vælg en ejendom i tabellen først. Den grønne en. Ja, den.");
+    return;
+  }
+  openBuyModal(selectedListingIdx);
+}
+
+function handleQuickSell() {
+  if (state.properties.length === 0) {
+    showQuote("Du ejer ingenting. Et stolt øjeblik i din spekulantkarriere.");
+    return;
+  }
+  // Switch to portfolio tab
+  switchTab('portfolio', document.querySelector('.tab-btn:nth-child(2)'));
+}
+
+// === QUOTE BOX ===
+function showQuote(msg) {
+  document.getElementById('quote-box').textContent = '"' + msg + '"';
+}
+
+// === OVERRIDE renderAll to use new UI ===
+const _origRenderAll = renderAll;
+
+function renderAll() {
+  renderTitlebar();
+  renderScreen();
+  renderInfoRow();
+  renderMarketPanel();
+  renderPortfolioPanel();
+  renderTravelPanel();
+}
+
+function renderTitlebar() {
+  const d = String(state.day).padStart(2, '0');
+  document.getElementById('titlebar-day').textContent = 'DAY ' + d + '/30';
+  const btn = document.getElementById('btn-next-day');
+  if (state.day >= 30) btn.classList.add('disabled-tab');
+  else btn.classList.remove('disabled-tab');
+}
+
+function renderScreen() {
+  const cash = state.cash;
+  const debt = state.debt;
+
+  document.getElementById('stat-cash').textContent = fmtShort(cash);
+  document.getElementById('stat-debt').textContent = fmtShort(debt);
+
+  // Cash meter (green, 10 bars)
+  const cashMax = 3000000;
+  const cashBars = Math.max(0, Math.min(10, Math.round((cash / cashMax) * 10)));
+  document.getElementById('meter-cash').innerHTML =
+    Array.from({length: 10}, (_, i) =>
+      `<div class="meter-bar${i < cashBars ? ' green-on' : ''}"></div>`
+    ).join('');
+
+  // Debt meter (red, 10 bars)
+  const debtMax = 2000000;
+  const debtBars = Math.max(0, Math.min(10, Math.round((debt / debtMax) * 10)));
+  document.getElementById('meter-debt').innerHTML =
+    Array.from({length: 10}, (_, i) =>
+      `<div class="meter-bar${i < debtBars ? ' red-on' : ''}"></div>`
+    ).join('');
+
+  // Mental health = inverse of debt ratio + property count pressure
+  const mentalScore = Math.max(0, 10 - debtBars - Math.max(0, state.properties.length - 1));
+  const mentalLabel = mentalScore >= 8 ? 'FREMRAGENDE' : mentalScore >= 5 ? 'STABIL' : mentalScore >= 3 ? 'PRESSET' : 'KRITISK';
+  const mentalColor = mentalScore >= 8 ? 'green' : mentalScore >= 5 ? 'yellow' : 'red';
+  const mentalClass = mentalScore >= 5 ? 'yellow-on' : 'red-on';
+  document.getElementById('stat-mental').textContent = mentalLabel;
+  document.getElementById('stat-mental').className = 'screen-value ' + mentalColor;
+  document.getElementById('meter-mental').innerHTML =
+    Array.from({length: 10}, (_, i) =>
+      `<div class="meter-bar${i < mentalScore ? ' ' + mentalClass : ''}"></div>`
+    ).join('');
+}
+
+function renderInfoRow() {
+  document.getElementById('stat-location').textContent = LOCATIONS[state.currentLocation].name;
+}
+
+function renderMarketPanel() {
+  document.getElementById('market-loc-name').textContent = LOCATIONS[state.currentLocation].name.toUpperCase();
+  document.getElementById('market-count').textContent = state.properties.length + '/' + state.maxProperties + ' EJENDOMME';
+
+  const tbody = document.getElementById('market-tbody');
+  tbody.innerHTML = currentListings.map((listing, idx) => {
+    const type = PROPERTY_TYPES[listing.typeKey];
+    return `<tr onclick="selectListing(${idx})" ${selectedListingIdx === idx ? 'class="selected"' : ''}>
+      <td>${type.name}<br><span style="font-size:10px;color:#666">${listing.quip}</span></td>
+      <td>${fmtShort(listing.price)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPortfolioPanel() {
+  const list = document.getElementById('portfolio-list');
+  document.getElementById('portfolio-count').textContent = state.properties.length + '/' + state.maxProperties;
+
+  if (state.properties.length === 0) {
+    list.innerHTML = `<div class="empty-portfolio">
+      Du ejer ingen ejendomme endnu.<br>
+      <span style="font-size:10px">"Første skridt er altid det sværeste — og det dyreste."</span>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = state.properties.map((prop, i) => {
+    const type = PROPERTY_TYPES[prop.type];
+    const loc = LOCATIONS[prop.location];
+    const profit = prop.currentValue - prop.purchasePrice;
+    const pct = Math.round((profit / prop.purchasePrice) * 100);
+    const isUp = profit >= 0;
+    const upgradeNames = prop.upgrades.map(u => RENOVATIONS[u].emoji + ' ' + RENOVATIONS[u].name).join(' · ');
+
+    return `<div class="asset-card">
+      <div class="asset-header">
+        <div>
+          <span class="asset-number">ASSET #${String(i+1).padStart(2,'0')}</span>
+          <span class="asset-name">${type.name}</span>
+        </div>
+        <span class="asset-change ${isUp ? 'up' : 'down'}">${isUp ? '↑' : '↓'} ${Math.abs(pct)}%</span>
+      </div>
+      <div class="asset-detail">
+        ${loc.name} · Købt: ${fmtShort(prop.purchasePrice)} · Nu: ${fmtShort(prop.currentValue)}
+      </div>
+      ${upgradeNames ? `<div class="asset-upgrades">${upgradeNames}</div>` : ''}
+      <div class="asset-btns">
+        <button class="btn btn-danger" onclick="openSellModal(${prop.id})">SÆLG</button>
+        <button class="btn" onclick="openRenovateModal(${prop.id})">RENOVÉR</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderTravelPanel() {
+  const list = document.getElementById('travel-list');
+  list.innerHTML = Object.entries(LOCATIONS).map(([key, loc]) => `
+    <button class="btn travel-btn ${key === state.currentLocation ? 'current-loc' : ''}" onclick="travel('${key}')">
+      <span>${key === state.currentLocation ? '● ' : '○ '}${loc.name}</span>
+      <span class="loc-vol">${loc.description}</span>
+    </button>
+  `).join('');
+}
+
+// === FORMAT SHORT ===
+function fmtShort(n) {
+  n = Math.round(n);
+  if (Math.abs(n) >= 1000000) return (n/1000000).toFixed(1).replace('.', ',') + 'M';
+  if (Math.abs(n) >= 1000) return (n/1000).toFixed(0) + 'K';
+  return n.toString();
+}
+
+// === OVERRIDE MODAL FUNCTIONS ===
+function openModal(html, title) {
+  document.getElementById('modal-title-text').textContent = title || 'DIALOG';
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.add('hidden');
+}
+
+function openBuyModal(idx) {
+  const listing = currentListings[idx];
+  const type = PROPERTY_TYPES[listing.typeKey];
+  const canAfford = state.cash >= listing.price;
+  const full = state.properties.length >= state.maxProperties;
+
+  openModal(`
+    <h3>${type.name}</h3>
+    <p>${listing.quip}<br><br>
+    Pris: <strong>${fmtShort(listing.price)}</strong><br>
+    Bydel: ${LOCATIONS[state.currentLocation].name}<br>
+    Risiko: ${type.riskLevel}</p>
+    <div class="modal-options">
+      <button class="btn modal-opt ${canAfford && !full ? 'btn-primary' : ''}"
+        onclick="buyProperty('${listing.typeKey}', ${listing.price})"
+        ${!canAfford || full ? 'disabled' : ''}>
+        <span class="opt-label">KØB — ${fmtShort(listing.price)}</span>
+        <span class="opt-detail">${full ? 'Portefølje fuld' : !canAfford ? 'Ikke råd' : 'Bekræft køb'}</span>
+      </button>
+    </div>
+  `, 'KØB EJENDOM');
+}
+
+function openSellModal(propId) {
+  const prop = state.properties.find(p => p.id === propId);
+  if (!prop) return;
+  const type = PROPERTY_TYPES[prop.type];
+  const profit = prop.currentValue - prop.purchasePrice;
+  const blocked = prop.type === 'coop' && state.coopBlockedDays > 0;
+
+  openModal(`
+    <h3>${type.name}</h3>
+    <p>
+      Købt for: ${fmtShort(prop.purchasePrice)}<br>
+      Nuværende: ${fmtShort(prop.currentValue)}<br>
+      <strong style="color:${profit >= 0 ? 'var(--green-dim)' : 'var(--red)'}">
+        ${profit >= 0 ? 'GEVINST' : 'TAB'}: ${fmtShort(Math.abs(profit))}
+      </strong>
+      ${blocked ? '<br><br><em>Andelsforeningen blokerer i ' + state.coopBlockedDays + ' dag(e).</em>' : ''}
+    </p>
+    <div class="modal-options">
+      <button class="btn modal-opt btn-danger" onclick="sellProperty(${propId})" ${blocked ? 'disabled' : ''}>
+        <span class="opt-label">SÆLG FOR ${fmtShort(prop.currentValue)}</span>
+        <span class="opt-detail">${blocked ? 'Blokeret af andelsforening' : 'Bekræft salg'}</span>
+      </button>
+    </div>
+  `, 'SÆLG EJENDOM');
+}
+
+function openRenovateModal(propId) {
+  const prop = state.properties.find(p => p.id === propId);
+  if (!prop) return;
+
+  const options = Object.entries(RENOVATIONS).map(([key, r]) => {
+    const owned = prop.upgrades.includes(key);
+    let cost = r.cost;
+    if (state.renovationDiscount) cost = Math.round(cost * 0.8);
+    const canAfford = state.cash >= cost;
+    return `
+      <button class="btn modal-opt" onclick="renovateProperty(${propId}, '${key}')" ${owned || !canAfford ? 'disabled' : ''}>
+        <span class="opt-label">${r.emoji} ${r.name} ${owned ? '(installeret)' : ''}</span>
+        <span class="opt-detail">+${Math.round(r.valueBoost * 100)}% · ${fmtShort(cost)}${state.renovationDiscount && !owned ? ' (rabat!)' : ''}</span>
+      </button>`;
+  }).join('');
+
+  openModal(`
+    <h3>${PROPERTY_TYPES[prop.type].name}</h3>
+    <p>Vælg opgradering. Sælger kaldte det "investeringsvenligt potentiale."</p>
+    <div class="modal-options">${options}</div>
+  `, 'RENOVÉR');
+}
+
+// === OVERRIDE EVENT BANNER ===
+function showEventBanner(event) {
+  const ticker = document.getElementById('event-ticker');
+  document.getElementById('ticker-tag').textContent = event.emoji;
+  document.getElementById('ticker-text').textContent = event.text(state);
+  ticker.classList.remove('hidden');
+  document.getElementById('stat-event').textContent = event.text(state).substring(0, 28) + '…';
+
+  const quotes = [
+    "Ejendomsmægleren smiler stadig. Det er ikke et godt tegn.",
+    "Naboen solgte til det dobbelte. Du overvejer at flytte.",
+    "Markedet er irrationelt. Det er det altid.",
+    "Din revisor sender en bekymret e-mail.",
+    "Eksperten på DR siger 'blød landing'. Alle griner.",
+    "Du overvejer en podcast om ejendomsinvestering.",
+  ];
+  showQuote(quotes[Math.floor(Math.random() * quotes.length)]);
+}
+
+function showToast(msg) {
+  showQuote(msg);
+}
+
+// === OVERRIDE nextDay to handle end ===
+const _origNextDay = nextDay;
+window._nextDayOverridden = false;
+
+// INIT
+initState();
+refreshMarket();
+renderAll();
+selectedListingIdx = null;
+</script>
 </body>
 </html>

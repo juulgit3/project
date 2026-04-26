@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boligboblen</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- HEADER -->
+    <header id="header">
+      <div class="header-title">
+        <span class="logo-dk">🏚</span>
+        <h1>Boligboblen</h1>
+        <span class="tagline">Ejendomsspekulant simulator — København, 2024</span>
+      </div>
+      <div class="header-stats">
+        <div class="stat">
+          <span class="stat-label">DAG</span>
+          <span class="stat-value" id="stat-day">1 / 30</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">KASSE</span>
+          <span class="stat-value cash" id="stat-cash">500.000 kr</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">GÆLD</span>
+          <span class="stat-value debt" id="stat-debt">0 kr</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">BYDEL</span>
+          <span class="stat-value" id="stat-location">Nørrebro</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- EVENT BANNER -->
+    <div id="event-banner" class="event-banner hidden">
+      <span id="event-icon">📰</span>
+      <span id="event-text">Ingen begivenheder</span>
+    </div>
+
+    <!-- MAIN LAYOUT -->
+    <main id="main">
+
+      <!-- LEFT: MAP / TRAVEL -->
+      <section class="panel" id="panel-travel">
+        <h2>📍 Bydele</h2>
+        <div id="location-grid"></div>
+      </section>
+
+      <!-- CENTER: MARKET -->
+      <section class="panel" id="panel-market">
+        <h2>🏷 Marked — <span id="market-location-name">Nørrebro</span></h2>
+        <div id="market-listings"></div>
+      </section>
+
+      <!-- RIGHT: PORTFOLIO + ACTIONS -->
+      <section class="panel" id="panel-portfolio">
+        <h2>🗂 Din portefølje</h2>
+        <div id="portfolio-list">
+          <p class="empty-msg">Du ejer ingen ejendomme endnu.<br><small>"Første skridt er altid det sværeste — og dyrest."</small></p>
+        </div>
+
+        <div class="action-group">
+          <h3>💳 Lån</h3>
+          <button class="btn btn-secondary" onclick="takeLoan('bank')">Banklån (max 2M, 5%/dag)</button>
+          <button class="btn btn-secondary" onclick="takeLoan('parent')">Forældrelån (max 1M, 1%/dag)</button>
+        </div>
+
+        <div class="action-group next-day-wrap">
+          <button class="btn btn-primary" id="btn-next-day" onclick="nextDay()">Næste dag →</button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- END SCREEN -->
+    <div id="end-screen" class="hidden">
+      <div class="end-card">
+        <div class="end-emoji" id="end-emoji">🏆</div>
+        <h2 id="end-title">Spillet er slut</h2>
+        <p id="end-score"></p>
+        <p id="end-message"></p>
+        <button class="btn btn-primary" onclick="restartGame()">Spil igen</button>
+      </div>
+    </div>
+
+    <!-- MODAL -->
+    <div id="modal-overlay" class="hidden" onclick="closeModal()">
+      <div id="modal" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="closeModal()">✕</button>
+        <div id="modal-content"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
